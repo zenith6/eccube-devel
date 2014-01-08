@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Devel" default="build">
+    <property file="build.properties" />
+    
+    <target name="prepare">
+        <mkdir dir="${dist_dir}" />
+    </target>
+    
+    <target name="build" depends="prepare">
+        <property name="package" value="${dist_dir}/${package_prefix}${plugin_version}${package_suffix}.tar.gz" />
+        <delete file="${package}" quiet="true" />
+        <tar basedir="${src_dir}" destfile="${package}" compression="gzip" />
+    </target>
+</project>

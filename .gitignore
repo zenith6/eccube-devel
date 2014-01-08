@@ -1,0 +1,11 @@
+# Eclipse
+/.settings
+/.buildpath
+/.project
+
+# Mac OS
+.DS_Store
+
+# Build tool
+/dist/*
+!/dist/.keep
