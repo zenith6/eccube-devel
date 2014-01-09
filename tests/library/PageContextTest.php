@@ -78,8 +78,4 @@ class Zenith_Eccube_PageContextTest extends PHPUnit_Framework_TestCase {
         );
         $this->assertEquals($expected, $context->getArrayCopy());
     }
-    
-    public function testFail() {
-        $this->assertEmpty(1);
-    }
 }
