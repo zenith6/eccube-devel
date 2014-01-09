@@ -64,11 +64,10 @@ class plg_Devel_LC_Page_Config extends LC_Page_Admin_Ex {
      * @return Zenith_Eccube_PageContext
      */
     protected function restoreContext() {
-        $serialized = @$_REQUEST['context'];
-        if ($serialized !== null) {
-            $context = Zenith_Eccube_PageContext::restore($serialized);
-        } else {
-            $context = $this->createContext();
+        $context = $this->createDefaultContext();
+        $encoded = @$_REQUEST['context'];
+        if ($encoded !== null) {
+            $context->restore($encoded);
         }
         return $context;
     }
@@ -76,8 +75,8 @@ class plg_Devel_LC_Page_Config extends LC_Page_Admin_Ex {
     /**
      * @return Zenith_Eccube_PageContext
      */
-    protected function createContext() {
-        $context = new Zenith_Eccube_PageContext();
+    protected function createDefaultContext() {
+        $context = new Zenith_Eccube_PageContext(array(), AUTH_MAGIC);
         
         return $context;
     }

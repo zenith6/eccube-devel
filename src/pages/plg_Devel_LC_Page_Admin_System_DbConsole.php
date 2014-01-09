@@ -68,11 +68,10 @@ class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
      * @return Zenith_Eccube_PageContext
      */
     protected function restoreContext() {
-        $serialized = @$_REQUEST['context'];
-        if ($serialized !== null) {
-            $context = Zenith_Eccube_PageContext::restore($serialized);
-        } else {
-            $context = $this->createContext();
+        $context = $this->createDefaultContext();
+        $encoded = @$_REQUEST['context'];
+        if ($encoded !== null) {
+            $context->restore($encoded);
         }
         return $context;
     }
@@ -80,8 +79,8 @@ class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
     /**
      * @return Zenith_Eccube_PageContext
      */
-    protected function createContext() {
-        $context = new Zenith_Eccube_PageContext();
+    protected function createDefaultContext() {
+        $context = new Zenith_Eccube_PageContext(array(), AUTH_MAGIC);
         
         $context['code'] = '';
         $context['transaction'] = 'rollback';
@@ -163,6 +162,7 @@ class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
                 
                 $query->begin();
                 $tx = $params->getValue('transaction');
+                $this->context['transaction'] = $tx;
                 switch ($tx) {
                     case 'commit':
                         $tx_label = 'コミット';
