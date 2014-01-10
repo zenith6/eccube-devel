@@ -33,7 +33,7 @@
 <script>
 $(window).load(function () {
     var height = document.body.scrollHeight;
-    height = Math.min(400, height);
+    height = Math.max(400, height);
     window.parent.document.getElementById('result').height = height;
 });
 </script>
