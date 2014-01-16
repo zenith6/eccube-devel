@@ -8,8 +8,40 @@
     </target>
     
     <target name="build" depends="prepare">
+        <get-plugin-info property="PLUGIN_VERSION" outputProperty="plugin_version" file="${src_dir}/plugin_info.php" />
         <property name="package" value="${dist_dir}/${package_prefix}${plugin_version}${package_suffix}.tar.gz" />
         <delete file="${package}" quiet="true" />
         <tar basedir="${src_dir}" destfile="${package}" compression="gzip" />
     </target>
+    
+    <adhoc-task name="get-plugin-info"><![CDATA[
+        class GetPluginVersion extends Task {
+            protected $file;
+            protected $property;
+            protected $outputProperty;
+            
+            public function main() {
+                $info_file = $this->infoFile->getPath();
+                require_once $info_file;
+                
+                if ($this->outputProperty != '') {
+                    $this->project->setProperty($this->outputProperty, plugin_info::$PLUGIN_VERSION);
+                }
+            }
+            
+            public function setFile(PhingFile $file) {
+                $this->infoFile = $file;
+            }
+
+            public function setProperty($property)
+            {
+                $this->property = $property;
+            }
+
+            public function setOutputProperty($outputProperty)
+            {
+                $this->outputProperty = $outputProperty;
+            }
+        }
+    ]]></adhoc-task>
 </project>
