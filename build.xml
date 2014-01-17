@@ -15,7 +15,7 @@
     </target>
     
     <adhoc-task name="get-plugin-info"><![CDATA[
-        class GetPluginVersion extends Task {
+        class GetPluginInfo extends Task {
             protected $file;
             protected $property;
             protected $outputProperty;
@@ -33,13 +33,11 @@
                 $this->infoFile = $file;
             }
 
-            public function setProperty($property)
-            {
+            public function setProperty($property) {
                 $this->property = $property;
             }
 
-            public function setOutputProperty($outputProperty)
-            {
+            public function setOutputProperty($outputProperty) {
                 $this->outputProperty = $outputProperty;
             }
         }
