@@ -30,7 +30,7 @@ class plugin_info {
     
     public static $PLUGIN_NAME = "開発支援プラグイン";
     
-    public static $PLUGIN_VERSION = "1.0.0";
+    public static $PLUGIN_VERSION = "1.1.0-dev";
     
     public static $COMPLIANT_VERSION = "2.12.0";
     
