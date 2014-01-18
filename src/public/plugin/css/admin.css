@@ -1,0 +1,37 @@
+/* ÉAÉâÅ[Ég */
+.flash {
+    padding: 1em;
+    margin: 1em 0;
+    border: 1px solid;
+    border-radius: 0.25em;
+}
+
+.flash-info {
+    background-color: #F8F8F8;
+    border-color: #D0D0D0;
+    color: #303030;
+}
+
+.flash-notice {
+    background-color: #D9EDF7;
+    border-color: #BCE8F1;
+    color: #31708F;
+}
+
+.flash-success {
+    background-color: #DFF0D8;
+    border-color: #D6E9C6;
+    color: #3C763D;
+}
+
+.flash-warning {
+    background-color: #FCF8E3;
+    border-color: #FAEBCC;
+    color: #8A6D3B;
+}
+
+.flash-error {
+    background-color: #F2DEDE;
+    border-color: #EBCCD1;
+    color: #A94442;
+}

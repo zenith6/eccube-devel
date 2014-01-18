@@ -17,8 +17,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *}-->
-
-<!--{if $smarty.const.DEBUG_MODE}-->
-    <li<!--{if $tpl_mainno == 'system' && $tpl_subno == 'console'}--> class="on"<!--{/if}--> id="navi-system-console"><a href="<!--{$smarty.const.ROOT_URLPATH|cat:$smarty.const.ADMIN_DIR|h}-->system/plg_Devel_php_console.php"><span>コンソール</span></a></li>
-<!--{/if}-->
-<li<!--{if tpl_mainno == 'system' && $tpl_subno == 'devel_dummy'}--> class="on"<!--{/if}--> id="navi-system-devel-dummy"><a href="<!--{$smarty.const.ROOT_URLPATH|cat:$smarty.const.ADMIN_DIR|h}-->system/plg_Devel_dummy_product.php"><span>ダミーデータ生成</span></a></li>
+ 
+<link rel="stylesheet" type="text/css" href="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/css/admin.css" media="all" />
+<script type="text/javascript" src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/js/holder.js"></script>

@@ -18,7 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *}-->
 
-<!--{if $smarty.const.DEBUG_MODE}-->
-    <li<!--{if $tpl_mainno == 'system' && $tpl_subno == 'console'}--> class="on"<!--{/if}--> id="navi-system-console"><a href="<!--{$smarty.const.ROOT_URLPATH|cat:$smarty.const.ADMIN_DIR|h}-->system/plg_Devel_php_console.php"><span>コンソール</span></a></li>
-<!--{/if}-->
-<li<!--{if tpl_mainno == 'system' && $tpl_subno == 'devel_dummy'}--> class="on"<!--{/if}--> id="navi-system-devel-dummy"><a href="<!--{$smarty.const.ROOT_URLPATH|cat:$smarty.const.ADMIN_DIR|h}-->system/plg_Devel_dummy_product.php"><span>ダミーデータ生成</span></a></li>
+<div class="btn">
+    <a class="btn-action" href="plg_Devel_dummy_product.php"><span class="btn-next">ダミー商品を生成</span></a>
+    <a class="btn-action" href="plg_Devel_dummy_class.php"><span class="btn-next">ダミー規格を生成</span></a>
+    <a class="btn-action" href="plg_Devel_dummy_category.php"><span class="btn-next">ダミーカテゴリを生成</span></a>
+</div>

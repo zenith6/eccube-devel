@@ -149,7 +149,14 @@ class Devel extends SC_Plugin_Base {
         
         switch ($device_type_id) {
             case DEVICE_TYPE_ADMIN:
-                if (DEBUG_MODE && Zenith_Eccube_Utils::isStringEndWith($filename, 'system/subnavi.tpl')) {
+                if (Zenith_Eccube_Utils::isStringEndWith($filename, 'main_frame.tpl')) {
+                    $tpl_path = "plg_Devel_main_frame_header.tpl";
+                    $tpl = "<!--{include file='{$tpl_path}'}-->";
+                    $transformer->select('head')->appendChild($tpl);
+                    break;
+                }
+                
+                if (Zenith_Eccube_Utils::isStringEndWith($filename, 'system/subnavi.tpl')) {
                     $tpl_path = "system/plg_Devel_subnavi_item.tpl";
                     $tpl = "<!--{include file='{$tpl_path}'}-->";
                     $transformer->select('ul')->appendChild($tpl);
