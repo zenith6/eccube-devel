@@ -30,7 +30,7 @@ require_once PLUGIN_UPLOAD_REALDIR . 'Devel/plugin_bootstrap.php';
 class Devel extends SC_Plugin_Base {
     /**
      * プラグイン設定
-     * @var mixed
+     * @var array
      */
     private static $settings;
     
@@ -229,10 +229,10 @@ class Devel extends SC_Plugin_Base {
     /**
      * 設定を保存します。
      * 
-     * @param mixed $settings
+     * @param array $settings
      * @return array
      */
-    public static function saveSettings($settings) {
+    public static function saveSettings(array $settings) {
         $query = SC_Query_Ex::getSingletonInstance();
         
         $values = array();
@@ -255,7 +255,7 @@ class Devel extends SC_Plugin_Base {
      */
     public static function getSetting($key, $default = null) {
         $settings = self::loadSettings();
-        return property_exists($settings, $key) ? $settings->$key : $default;
+        return array_key_exists($key, $settings) ? $settings[$key] : $default;
     }
     
     /**
