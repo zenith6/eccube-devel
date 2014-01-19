@@ -81,10 +81,24 @@ class plg_Devel_LC_Page_Config extends LC_Page_Admin_Ex {
         return $context;
     }
     
-    protected function doEdit($errors = array()) {
-        $params = $this->buildFormParam($this->context);
+    /**
+     * @param SC_FormParam_Ex $params
+     * @param array $errors
+     */
+    protected function doEdit(SC_FormParam_Ex $params = null, array $errors = array()) {
+        if (!$params) {
+            $params = $this->buildFormParam();
+            $this->setDefaultFormValues($params);
+        }
+
         $form = $this->buildForm($params, $errors);
         $this->form = $form;
+    }
+    
+    protected function setDefaultFormValues(SC_FormParam_Ex $params) {
+        $settings = Devel::loadSettings();
+        
+        $params->setValue('use_holderjs', (int)$settings['use_holderjs']);
     }
     
     protected function doSave() {
@@ -92,20 +106,22 @@ class plg_Devel_LC_Page_Config extends LC_Page_Admin_Ex {
             $query = SC_Query_Ex::getSingletonInstance();
             $query->begin();
             
-            $params = $this->buildFormParam($this->context);
+            $params = $this->buildFormParam();
             $params->setParam($_POST);
             
-            $errors = $this->validateFormParam($params, $this->context);
+            $errors = $this->validateFormParams($params);
             if ($errors) {
                 $query->rollback();
-                $this->doEdit($errors);
+                $this->doEdit($params, $errors);
                 return;
             }
+            
+            $this->updateSettings($params);
 
             $query->commit();
 
             $this->tpl_javascript = "$(window).load(function () { alert('登録しました。'); });";
-            $this->doEdit();
+            $this->doEdit($params);
         } catch (Exception $e) {
             $query->rollback();
             
@@ -118,7 +134,7 @@ class plg_Devel_LC_Page_Config extends LC_Page_Admin_Ex {
      * @param array $errors
      * @return array
      */
-    protected function buildForm(SC_FormParam_Ex $params, $errors = array()) {
+    protected function buildForm(SC_FormParam_Ex $params, array $errors = array()) {
         $form = array();
         
         foreach ($params->keyname as $index => $key) {
@@ -138,23 +154,34 @@ class plg_Devel_LC_Page_Config extends LC_Page_Admin_Ex {
     }
     
     /**
-     * @param Zenith_Eccube_PageContext $context
      * @return SC_FormParam_Ex
      */
-    protected function buildFormParam(Zenith_Eccube_PageContext $context) {
+    protected function buildFormParam() {
         $params = new SC_FormParam_Ex();
+
+        $params->addParam('holder.js を使用する', 'use_holderjs', 1, 'n', array());
         
         return $params;
     }
     
     /**
      * @param SC_FormParam_Ex $params
-     * @param Zenith_Eccube_PageContext $context
      * @return array
      */
-    protected function validateFormParam(SC_FormParam_Ex $params, Zenith_Eccube_PageContext $context) {
+    protected function validateFormParams(SC_FormParam_Ex $params) {
         $errors = $params->checkError();
 
         return $errors;
+    }
+    
+    /**
+     * @param SC_FormParam_Ex $params
+     */
+    protected function updateSettings(SC_FormParam_Ex $params) {
+        $settings = Devel::loadSettings(true);
+        
+        $settings['use_holderjs'] = (bool)$params->getValue('use_holderjs');
+        
+        Devel::saveSettings($settings);
     }
 }

@@ -29,6 +29,12 @@ require_once PLUGIN_UPLOAD_REALDIR . 'Devel/plugin_bootstrap.php';
  */
 class Devel extends SC_Plugin_Base {
     /**
+     * プラグイン設定
+     * @var mixed
+     */
+    private static $settings;
+    
+    /**
      * コンストラクタ
      */
     public function __construct(array $info) {
@@ -52,6 +58,19 @@ class Devel extends SC_Plugin_Base {
         $src_dir = PLUGIN_UPLOAD_REALDIR . "{$plugin_code}/templates/";
         $dest_dir = SMARTY_TEMPLATES_REALDIR;
         SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+        
+        // 設定を保存。
+        $settings = self::getDefaultSettings();
+        self::saveSettings($settings);
+    }
+    
+    /**
+     * @return array
+     */
+    public static function getDefaultSettings() {
+        return array(
+            'use_holderjs' => true,
+        );
     }
     
     /**
@@ -164,8 +183,88 @@ class Devel extends SC_Plugin_Base {
                 }
                 
                 break;
+
+            case DEVICE_TYPE_PC:
+                if (Zenith_Eccube_Utils::isStringEndWith($filename, 'site_frame.tpl')) {
+                    $tpl_path = "plg_Devel_site_frame_header.tpl";
+                    $tpl = "<!--{include file='{$tpl_path}'}-->";
+                    $transformer->select('head')->appendChild($tpl);
+                    break;
+                }
+
+                if (Zenith_Eccube_Utils::isStringEndWith($filename, 'popup_frame.tpl')) {
+                    $tpl_path = "plg_Devel_popup_frame_header.tpl";
+                    $tpl = "<!--{include file='{$tpl_path}'}-->";
+                    $transformer->select('head')->appendChild($tpl);
+                    break;
+                }
+                
+                break;
         }
         
         $source = $transformer->getHTML();
+    }
+    
+    /**
+     * 設定を読み込みます。
+     * 
+     * @param bool $reload
+     * @return array
+     */
+    public static function loadSettings($reload = false) {
+        if ($reload || self::$settings === null) {
+            $query = SC_Query_Ex::getSingletonInstance();
+            
+            $free_field2 = $query->get('free_field2', 'dtb_plugin', 'plugin_code = ?', array('Devel'));
+            if (PEAR::isError($free_field2)) {
+                throw new RuntimeException($free_field2->toString());
+            }
+
+            self::$settings = Zenith_Eccube_Utils::decodeJson($free_field2, true);
+        }
+        
+        return self::$settings;
+    }
+    
+    /**
+     * 設定を保存します。
+     * 
+     * @param mixed $settings
+     * @return array
+     */
+    public static function saveSettings($settings) {
+        $query = SC_Query_Ex::getSingletonInstance();
+        
+        $values = array();
+
+        $free_field2 = Zenith_Eccube_Utils::encodeJson($settings);
+        $values['free_field2'] = $free_field2;
+
+        $query->update('dtb_plugin', $values, 'plugin_code = ?', array('Devel'));
+        if (PEAR::isError($free_field2)) {
+            throw new RuntimeException($free_field2->toString());
+        }
+    }
+    
+    /**
+     * 指定した設定を取得します。
+     * 
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public static function getSetting($key, $default = null) {
+        $settings = self::loadSettings();
+        return property_exists($settings, $key) ? $settings->$key : $default;
+    }
+    
+    /**
+     * プラグインの情報を
+     * 
+     * @param LC_Page_Ex $page
+     */
+    public function preProcess(LC_Page_Ex $page) {
+        $settings = self::loadSettings();
+        $page->plg_Devel_settings = $settings;
     }
 }

@@ -30,6 +30,17 @@
     <div class="form">
         <h3>設定</h3>
         
+        <table class="form">
+            <tr>
+                <th>ダミー画像</th>
+                <td>
+                    <!--{if $form.use_holderjs.error}--><span class="attention"><!--{$form.use_holderjs.error}--></span><!--{/if}-->
+                    <label><input type="checkbox" name="use_holderjs" value="1" <!--{if $form.use_holderjs.value}-->checked="checked"<!--{/if}--> <!--{if $form.use_holderjs.error}--><!--{sfSetErrorStyle}--><!--{/if}--> /> <!--{$form.use_holderjs.title|h}--></label><br />
+                    ダミー商品等で holder.js を使用している場合に有効にして下さい。
+                </td>
+            </tr>
+        </table>
+        
         <div class="btn-area">
             <ul>
                 <li>
