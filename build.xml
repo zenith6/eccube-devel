@@ -14,6 +14,10 @@
         <tar basedir="${src_dir}" destfile="${package}" compression="gzip" />
     </target>
     
+    <target name="generate-migration">
+        <eccube-generate-migration name="${name}" dir="${src_dir}/migrations" templateFile="tools/migration.php.tpl" />
+    </target>
+    
     <adhoc-task name="get-plugin-info"><![CDATA[
         class GetPluginInfo extends Task {
             protected $file;
@@ -39,6 +43,59 @@
 
             public function setOutputProperty($outputProperty) {
                 $this->outputProperty = $outputProperty;
+            }
+        }
+    ]]></adhoc-task>
+    
+    <adhoc-task name="eccube-generate-migration"><![CDATA[
+        class EccubeGenerateMigration extends Task {
+            protected $name;
+            protected $dir;
+            protected $templateFile;
+            
+            public function main() {
+                $template_file = $this->templateFile->getPath();
+                $template = file_get_contents($template_file);
+                if ($template === false) {
+                    throw new BuildException("Unable to read template file: " . $this->templateFile->getAbsolutePath());
+                }
+                
+                $name = $this->name;
+                if (!preg_match('/\\A[0-9A-Za-z_]+\\z/u', $name)) {
+                    throw new BuildException("Invalid name specified. can not use except class identifier: " . $name);
+                }
+                
+                $version = gmdate('YmdHis') . '_' . $name;
+                
+                $filename = $version . '.php';
+                $dest = $this->dir->getPath() . '/' . $filename;
+                if (file_exists($filename)) {
+                    throw new BuildException("Unable to create migration container. file already exists: " . $dest);
+                }
+                
+                $replacements = array(
+                    '___TPL_CLASS___' => $name,
+                    '___TPL_BASE___'  => 'Zenith_Eccube_Migration',
+                );
+                $container = strtr($template, $replacements);
+                if (file_put_contents($dest, $container) === false) {
+                    throw new BuildException("Failed to create migration container. file already exists: " . $dest);
+                }
+                
+                $log = sprintf('Created migration: %s to "%s"', $version, $dest);
+                $this->log($log);
+            }
+
+            public function setName($name) {
+                $this->name = $name;
+            }
+            
+            public function setDir(PhingFile $dir) {
+                $this->dir = $dir;
+            }
+            
+            public function setTemplateFile(PhingFile $file) {
+                $this->templateFile = $file;
             }
         }
     ]]></adhoc-task>
