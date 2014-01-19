@@ -19,7 +19,7 @@
     </target>
     
     <adhoc-task name="get-plugin-info"><![CDATA[
-        class GetPluginInfo extends Task {
+        class EccubeGetPluginInfo extends Task {
             protected $file;
             protected $property;
             protected $outputProperty;
