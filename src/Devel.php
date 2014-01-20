@@ -44,9 +44,9 @@ class Devel extends SC_Plugin_Base {
     /**
      * プラグインをインストールします。
      *
-     * @param array $info プラグイン情報(dtb_plugin)
+     * @param array $info プラグイン情報
      */
-    public function install($info) {
+    public function install(array $info) {
         $plugin_code = $info['plugin_code'];
 
         // ロゴを配置。
@@ -55,9 +55,7 @@ class Devel extends SC_Plugin_Base {
         copy($src, $dest);
 
         // テンプレートを配置。
-        $src_dir = PLUGIN_UPLOAD_REALDIR . "{$plugin_code}/templates/";
-        $dest_dir = SMARTY_TEMPLATES_REALDIR;
-        SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+        self::installTemplates($info);
         
         // 設定を保存。
         $settings = self::getDefaultSettings();
@@ -86,9 +84,7 @@ class Devel extends SC_Plugin_Base {
         unlink($path);
         
         // テンプレートを削除。 
-        $target_dir = SMARTY_TEMPLATES_REALDIR;
-        $source_dir = PLUGIN_UPLOAD_REALDIR . "{$plugin_code}/templates/";
-        Zenith_Eccube_Utils::deleteFileByMirror($target_dir, $source_dir);
+        self::uninstallTemplates($info);
     }
     
     /**
@@ -153,6 +149,84 @@ class Devel extends SC_Plugin_Base {
     }
     
     /**
+     * プラグインのテンプレートを各デバイステンプレートに配置します。
+     * 
+     * @param array $info プラグイン情報
+     */
+    public static function installTemplates(array $info) {
+        // 管理画面
+        $plugin_code = $info['plugin_code'];
+        $src_base = PLUGIN_UPLOAD_REALDIR . "{$plugin_code}/templates/";
+        
+        $src_dir = $src_base . 'admin/';
+        $dest_dir = SMARTY_TEMPLATES_REALDIR . 'admin/';
+        SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+        
+        $query = SC_Query_Ex::getSingletonInstance();
+        $templates = $query->select('template_code, device_type_id', 'dtb_templates');
+        foreach ($templates as $template) {
+            switch ($template['device_type_id']) {
+                case DEVICE_TYPE_PC:
+                    $src_dir = $src_base . 'default/';
+                    $dest_dir = SMARTY_TEMPLATES_REALDIR . $template['template_code'] . '/';
+                    SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+                    break;
+        
+                case DEVICE_TYPE_SMARTPHONE:
+                    $src_dir = $src_base . 'sphone/';
+                    $dest_dir = SMARTY_TEMPLATES_REALDIR . $template['template_code'] . '/';
+                    SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+                    break;
+        
+                case DEVICE_TYPE_MOBILE:
+                    $src_dir = $src_base . 'mobile/';
+                    $dest_dir = SMARTY_TEMPLATES_REALDIR . $template['template_code'] . '/';
+                    SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+                    break;
+            }
+        }
+    }
+    
+    /**
+     * プラグインのテンプレートを各デバイステンプレートから削除します。
+     * 
+     * @param array $info プラグイン情報
+     */
+    public static function uninstallTemplates(array $info) {
+        // 管理画面
+        $plugin_code = $info['plugin_code'];
+        $src_base = PLUGIN_UPLOAD_REALDIR . "{$plugin_code}/templates/";
+
+        $target_dir = SMARTY_TEMPLATES_REALDIR . 'admin/';
+        $src_dir = $src_base . 'admin/';
+        Zenith_Eccube_Utils::deleteFileByMirror($target_dir, $src_dir);
+
+        $query = SC_Query_Ex::getSingletonInstance();
+        $templates = $query->select('template_code, device_type_id', 'dtb_templates');
+        foreach ($templates as $template) {
+            switch ($template['device_type_id']) {
+                case DEVICE_TYPE_PC:
+                    $target_dir = SMARTY_TEMPLATES_REALDIR . $template['template_code'] . '/';
+                    $src_dir = $src_base . 'default/';
+                    Zenith_Eccube_Utils::deleteFileByMirror($target_dir, $src_dir);
+                    break;
+        
+                case DEVICE_TYPE_SMARTPHONE:
+                    $target_dir = SMARTY_TEMPLATES_REALDIR . $template['template_code'] . '/';
+                    $src_dir = $src_base . 'sphone/';
+                    Zenith_Eccube_Utils::deleteFileByMirror($target_dir, $src_dir);
+                    break;
+        
+                case DEVICE_TYPE_MOBILE:
+                    $target_dir = SMARTY_TEMPLATES_REALDIR . $template['template_code'] . '/';
+                    $src_dir = $src_base . 'mobile/';
+                    Zenith_Eccube_Utils::deleteFileByMirror($target_dir, $src_dir);
+                    break;
+            }
+        }
+    }
+    
+    /**
      * prefilterTransform フックアクション。
      * 
      * @param string $source
@@ -185,6 +259,21 @@ class Devel extends SC_Plugin_Base {
                 break;
 
             case DEVICE_TYPE_PC:
+                if (Zenith_Eccube_Utils::isStringEndWith($filename, 'site_frame.tpl')) {
+                    $tpl_path = "plg_Devel_site_frame_header.tpl";
+                    $tpl = "<!--{include file='{$tpl_path}'}-->";
+                    $transformer->select('head')->appendChild($tpl);
+                    break;
+                }
+
+                if (Zenith_Eccube_Utils::isStringEndWith($filename, 'popup_frame.tpl')) {
+                    $tpl_path = "plg_Devel_popup_frame_header.tpl";
+                    $tpl = "<!--{include file='{$tpl_path}'}-->";
+                    $transformer->select('head')->appendChild($tpl);
+                    break;
+                }
+
+            case DEVICE_TYPE_SMARTPHONE:
                 if (Zenith_Eccube_Utils::isStringEndWith($filename, 'site_frame.tpl')) {
                     $tpl_path = "plg_Devel_site_frame_header.tpl";
                     $tpl = "<!--{include file='{$tpl_path}'}-->";
