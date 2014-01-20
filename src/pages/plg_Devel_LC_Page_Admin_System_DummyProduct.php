@@ -216,6 +216,7 @@ class plg_Devel_LC_Page_Admin_System_DummyProduct extends LC_Page_Admin_Ex {
     private $exts;
     private $dispIds;
     private $categoryIds;
+    private $colors;
     
     private function prepareCache(SC_Query_Ex $query) {
         $this->alphabets = new Zenith_Dummy_StringGenerator();
@@ -243,6 +244,15 @@ class plg_Devel_LC_Page_Admin_System_DummyProduct extends LC_Page_Admin_Ex {
         $this->classeCategories = $classeCategories;
         
         $this->exts = array('jpg', 'txt', 'png', 'gif', 'pdf', 'zip', 'tar.gz');
+        
+        $this->colors = array(
+            'sky',
+            'vine',
+            'lava',
+            'gray',
+            'industrial',
+            'social',
+        );
     }
     
     /**
@@ -278,18 +288,29 @@ class plg_Devel_LC_Page_Admin_System_DummyProduct extends LC_Page_Admin_Ex {
         $values['note'] = $this->text->generate(array('min_length' => 0, 'max_length' => LLTEXT_LEN / 10));
 
         $values['main_comment'] = $this->text->generate(array('min_length' => 0, 'max_length' => LLTEXT_LEN / 10));
-        $values['main_image'] = 'holder.js/260x260/text:' . rawurlencode($values['name']);
-        $values['main_large_image'] = 'holder.js/500x500/text:' . rawurlencode($values['name']);
+        
+        $image_color = $this->colors[array_rand($this->colors, 1)];
+        $image_text = "{$product_id}_main_image";
+        $values['main_image'] = 'holder.js/260x260/' . rawurldecode($image_color) . '/text:' . rawurlencode($image_text);
+
+        $image_text = "{$product_id}_main_large_image";
+        $values['main_large_image'] = 'holder.js/500x500/' .  rawurldecode($image_color) . '/text:' . rawurlencode($image_text);
         
         $values['main_list_comment'] = $this->text->generate(array('min_length' => 0, 'max_length' => MTEXT_LEN));
-        $values['main_list_image'] = 'holder.js/130x130/text:' . rawurlencode($values['name']);
+
+        $image_text = "{$product_id}_main_list_image";
+        $values['main_list_image'] = 'holder.js/130x130/' .  rawurldecode($image_color) . '/text:' . rawurlencode($image_text);
         
         $sub_num = mt_rand(0, PRODUCTSUB_MAX);
         for ($i = 1; $i <= $sub_num; $i++) {
             $values["sub_title{$i}"] = $this->text->generate(array('min_length' => 1, 'max_length' => STEXT_LEN, 'multiple' => false));
             $values["sub_comment{$i}"] = $this->text->generate(array('min_length' => 0, 'max_length' => LLTEXT_LEN / 10));
-            $values["sub_image{$i}"] = 'holder.js/200x200/text:' . rawurlencode($values['name']);
-            $values["sub_large_image{$i}"] = 'holder.js/500x500/text:' . rawurlencode($values['name']);
+            
+            $image_text = "{$product_id}_sub_image{$i}";
+            $values["sub_image{$i}"] = 'holder.js/200x200/' .  rawurldecode($image_color) . '/text:' . rawurlencode($image_text);
+
+            $image_text = "{$product_id}_sub_large_image{$i}";
+            $values["sub_large_image{$i}"] = 'holder.js/500x500/' .  rawurldecode($image_color) . '/text:' . rawurlencode($image_text);
         }
 
         $values['deliv_date_id'] = $this->deliveryDateIds[array_rand($this->deliveryDateIds, 1)];
