@@ -55,7 +55,7 @@ class Devel extends SC_Plugin_Base {
         copy($src, $dest);
 
         // テンプレートを配置。
-        self::installTemplates($info);
+        self::installTemplates($info, true);
         
         // 設定を保存。
         $settings = self::getDefaultSettings();
@@ -146,21 +146,25 @@ class Devel extends SC_Plugin_Base {
 
         // プラグイン関連の画面を挿入する。
         $plugin_helper->addAction('prefilterTransform', array($this, 'hook_prefilterTransform'));
+
+        // テンプレートが追加された際にプラグインのテンプレートをマージする。
+        $plugin_helper->addAction('LC_Page_Admin_Design_UpDown_action_after', array($this, 'hook_LC_Page_Admin_Design_UpDown_action_after'));
     }
     
     /**
      * プラグインのテンプレートを各デバイステンプレートに配置します。
      * 
      * @param array $info プラグイン情報
+     * @param bool $override ファイルを上書きする場合は TRUE、そうでない場合は FALSE。
      */
-    public static function installTemplates(array $info) {
+    public static function installTemplates(array $info, $override = false) {
         // 管理画面
         $plugin_code = $info['plugin_code'];
         $src_base = PLUGIN_UPLOAD_REALDIR . "{$plugin_code}/templates/";
         
         $src_dir = $src_base . 'admin/';
         $dest_dir = SMARTY_TEMPLATES_REALDIR . 'admin/';
-        SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+        SC_Utils_Ex::sfCopyDir($src_dir, $dest_dir, '', $override);
         
         $query = SC_Query_Ex::getSingletonInstance();
         $templates = $query->select('template_code, device_type_id', 'dtb_templates');
@@ -169,19 +173,19 @@ class Devel extends SC_Plugin_Base {
                 case DEVICE_TYPE_PC:
                     $src_dir = $src_base . 'default/';
                     $dest_dir = SMARTY_TEMPLATES_REALDIR . $template['template_code'] . '/';
-                    SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+                    SC_Utils_Ex::sfCopyDir($src_dir, $dest_dir, '', $override);
                     break;
         
                 case DEVICE_TYPE_SMARTPHONE:
                     $src_dir = $src_base . 'sphone/';
                     $dest_dir = SMARTY_TEMPLATES_REALDIR . $template['template_code'] . '/';
-                    SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+                    SC_Utils_Ex::sfCopyDir($src_dir, $dest_dir, '', $override);
                     break;
         
                 case DEVICE_TYPE_MOBILE:
                     $src_dir = $src_base . 'mobile/';
                     $dest_dir = SMARTY_TEMPLATES_REALDIR . $template['template_code'] . '/';
-                    SC_Utils_Ex::copyDirectory($src_dir, $dest_dir);
+                    SC_Utils_Ex::sfCopyDir($src_dir, $dest_dir, '', $override);
                     break;
             }
         }
@@ -355,5 +359,22 @@ class Devel extends SC_Plugin_Base {
     public function preProcess(LC_Page_Ex $page) {
         $settings = self::loadSettings();
         $page->plg_Devel_settings = $settings;
+    }
+    
+    /**
+     * テンプレートが追加された際にプラグインのテンプレートをマージします。
+     * 
+     * @param LC_Page_Admin_Design_UpDown $page
+     */
+    public function hook_LC_Page_Admin_Design_UpDown_action_after(LC_Page_Admin_Design_UpDown $page) {
+        switch ($page->getMode()) {
+            case 'upload':
+                if ($page->arrErr) {
+                    break;
+                }
+                
+                self::installTemplates($this->getPluginInfo(), false);
+                break;
+        }
     }
 }
