@@ -45,8 +45,9 @@ class Devel extends SC_Plugin_Base {
      * プラグインをインストールします。
      *
      * @param array $info プラグイン情報
+     * @param SC_Plugin_Installer $installer プラグインインストーラー
      */
-    public function install(array $info) {
+    public function install($info, SC_Plugin_Installer $installer = null) {
         $plugin_code = $info['plugin_code'];
 
         // ロゴを配置。
@@ -75,8 +76,9 @@ class Devel extends SC_Plugin_Base {
      * プラグインをアンインストールします。
      *
      * @param array $info プラグイン情報
+     * @param SC_Plugin_Installer $installer プラグインインストーラー
      */
-    public function uninstall($info) {
+    public function uninstall($info, SC_Plugin_Installer $installer = null) {
         $plugin_code = $info['plugin_code'];
 
         // ロゴを削除。
@@ -91,8 +93,9 @@ class Devel extends SC_Plugin_Base {
      * プラグインを有効化します。
      *
      * @param array $info プラグイン情報
+     * @param SC_Plugin_Installer $installer プラグインインストーラー
      */
-    public function enable($info) {
+    public function enable($info, SC_Plugin_Installer $installer = null) {
         $plugin_code = $info['plugin_code'];
         
         // プラグイン用の公開ファイルを配置。 
@@ -115,8 +118,9 @@ class Devel extends SC_Plugin_Base {
      * プラグインを無効化します。
      *
      * @param array $info プラグイン情報
+     * @param SC_Plugin_Installer $installer プラグインインストーラー
      */
-    public function disable($info) {
+    public function disable($info, SC_Plugin_Installer $installer = null) {
         $plugin_code = $info['plugin_code'];
         
         // プラグイン用の公開ファイルを削除。 
