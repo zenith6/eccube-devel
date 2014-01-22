@@ -55,10 +55,35 @@
 
     <div class="btn-area">
         <ul>
-            <li><a class="btn-action" href="javascript:;" onclick="fnSetFormSubmit('form1', 'mode', 'execute'); return false;"><span class="btn-next">実行する</span></a></li>
+            <li><a class="btn-action" href="javascript:;" onclick="fnSetFormSubmit('form1', 'mode', 'execute'); return false;"><span class="btn-next">実行する Ctrl+Enter</span></a></li>
         </ul>
     </div>
 </form>
+
+<link rel="stylesheet" type="text/css" href="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/lib/codemirror.css" media="all" />
+<script src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/lib/codemirror.js"></script>
+<script src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/edit/matchbrackets.js"></script>
+<script src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<script src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/mode/xml/xml.js"></script>
+<script src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/mode/javascript/javascript.js"></script>
+<script src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/mode/css/css.js"></script>
+<script src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/mode/clike/clike.js"></script>
+<script src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/mode/php/php.js"></script>
+
+<script>
+var editor = CodeMirror.fromTextArea($("textarea[name='code']").get(0), {
+    lineNumbers: true,
+    matchBrackets: true,
+    mode: "text/x-php",
+    indentUnit: 4,
+    extraKeys: {
+        "Ctrl-Enter": function (editor) {
+            var form = editor.getInputField().form;
+            form.submit();
+        }
+    }
+});
+</script>
 
 <h2>実行結果</h2>
 <iframe id="result" name="result" width="100%" height="400"></iframe>

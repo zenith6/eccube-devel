@@ -48,7 +48,7 @@
 
     <div class="btn-area">
         <ul>
-            <li><a class="btn-action" href="javascript:;" onclick="fnSetFormSubmit('form1', 'mode', 'execute'); return false;"><span class="btn-next">実行する</span></a></li>
+            <li><a class="btn-action" href="javascript:;" onclick="fnSetFormSubmit('form1', 'mode', 'execute'); return false;"><span class="btn-next">実行する Ctrl+Enter</span></a></li>
         </ul>
     </div>
 </form>
@@ -90,3 +90,21 @@
         <!--{/if}-->
     <!--{/foreach}-->
 <!--{/if}-->
+
+<link rel="stylesheet" type="text/css" href="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/lib/codemirror.css" media="all" />
+<script type="text/javascript" src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/lib/codemirror.js"></script>
+<script type="text/javascript" src="<!--{$smarty.const.PLUGIN_HTML_URLPATH|h}-->Devel/codemirror/mode/sql/sql.js"></script>
+<script type="text/javascript">
+var editor = CodeMirror.fromTextArea($("textarea[name='code']").get(0), {
+    lineNumbers: true,
+    matchBrackets: true,
+    mode: "text/x-sql",
+    indentUnit: 4,
+    extraKeys: {
+        "Ctrl-Enter": function (editor) {
+            var form = editor.getInputField().form;
+            form.submit();
+        }
+    }
+});
+</script>
