@@ -32,7 +32,7 @@ class plugin_info {
     
     public static $PLUGIN_VERSION = "1.1.0-dev";
     
-    public static $COMPLIANT_VERSION = "2.12.0, 2.12.1, 2.12.2, 2.12.3, 2.12.4, 2.12.5, 2.12.6, 2.13.0, 2.13.1";
+    public static $COMPLIANT_VERSION = "2.12.0";
     
     public static $AUTHOR = "Seiji Nitta";
     
