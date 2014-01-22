@@ -28,6 +28,11 @@ require_once CLASS_EX_REALDIR . 'page_extends/admin/LC_Page_Admin_Ex.php';
  * @author Seiji Nitta
  */
 class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
+    /**
+     * @var Zenith_Eccube_PageContext
+     */
+    public $context;
+    
     public function init() {
         parent::init();
         
@@ -88,10 +93,30 @@ class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
         return $context;
     }
 
-    protected function doEdit($errors = array()) {
-        $params = $this->buildFormParam($this->context);
+    /**
+     * @param SC_FormParam_Ex $params
+     * @param array $errors
+     */
+    protected function doEdit(SC_FormParam_Ex $params = null, array $errors = array()) {
+        if (!$params) {
+            $params = $this->buildFormParam();
+            $params->setParam($this->getDefaultFormValues());
+        }
+        
         $form = $this->buildForm($params, $errors);
         $this->form = $form;
+    }
+    
+    /**
+     * @param SC_FormParam_Ex $params
+     */
+    protected function getDefaultFormValues() {
+        $values = array();
+        
+        $values['code'] = $this->context['code'];
+        $values['transaction'] = $this->context['transaction'];
+        
+        return $values;
     }
     
     /**
@@ -124,14 +149,13 @@ class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
     }
     
     /**
-     * @param Zenith_Eccube_PageContext $context
      * @return SC_FormParam_Ex
      */
-    protected function buildFormParam(Zenith_Eccube_PageContext $context) {
+    protected function buildFormParam() {
         $params = new SC_FormParam_Ex();
         
-        $params->addParam('SQL 文', 'code', 65536, '', array('EXIST_CHECK', 'MAX_LENGTH_CHECK'), $context['code']);
-        $params->addParam('トランザクション', 'transaction', 10, '', array('EXIST_CHECK'), $context['transaction']);
+        $params->addParam('SQL 文', 'code', 65536, '', array('EXIST_CHECK', 'MAX_LENGTH_CHECK'), $this->context['code']);
+        $params->addParam('トランザクション', 'transaction', 10, '', array('EXIST_CHECK'), $this->context['transaction']);
         
         return $params;
     }
@@ -148,7 +172,7 @@ class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
     
     protected function doExecute() {
         try {
-            $params = $this->buildFormParam($this->context);
+            $params = $this->buildFormParam();
             $params->setParam($_POST);
             
             $errors = $this->validateFormParam($params);
@@ -219,6 +243,7 @@ class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
 
         $info = self::getStatementInfo($stmt);
         if ($info['empty']) {
+            $log['message'] = 'no executed, statement was empty.';
             return $log;
         }
         
@@ -247,7 +272,7 @@ class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
     private static function getStatementInfo($stmt) {
         self::$stmtInfo = array(
             'empty' => true,
-            'select' => false,
+            'select' => null,
         );
         
         $pattern = '#\'[^\']*\'|--[^\\r\\n]*[\\r\\n]*|/\*(?:[^*]|\*[^/])*\*/|\\w+|\\s+|.#mi';
@@ -260,15 +285,19 @@ class plg_Devel_LC_Page_Admin_System_DbConsole extends LC_Page_Admin_Ex {
 
     private static function updateStatementInfo($captures) {
         $token = $captures[0];
-
-        if (strtolower($token) == 'select') {
-            self::$stmtInfo['select'] = true;
-            self::$stmtInfo['empty'] = false;
-            return;
-        }
-        
         if (trim($token) == '') {
             return;
+        }
+
+        static $selectors = array(
+            'select',
+            'show',
+            'explain',
+            'describe',
+            'analyze',
+        );
+        if (self::$stmtInfo['empty'] && in_array(strtolower($token), $selectors)) {
+            self::$stmtInfo['select'] = true;
         }
 
         switch (substr($token, 0, 1)) {

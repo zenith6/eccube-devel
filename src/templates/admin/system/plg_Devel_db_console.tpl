@@ -75,7 +75,13 @@
                     <!--{foreach from=$result.rows item=row}-->
                         <tr>
                             <!--{foreach from=$row item=col}-->
-                                <td><!--{$col|h}--></td>
+                                <td>
+                                    <!--{if $col === null}-->
+                                        <span class="db-null">NULL</span>
+                                    <!--{else}-->
+                                        <!--{$col|h}-->
+                                    <!--{/if}-->    
+                                </td>
                             <!--{/foreach}-->
                         </tr>
                     <!--{/foreach}-->

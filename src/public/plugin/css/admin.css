@@ -35,3 +35,15 @@
     border-color: #EBCCD1;
     color: #A94442;
 }
+
+.db-null {
+    color: gray;
+}
+
+.db-null:before {
+    content: "(";
+}
+
+.db-null:after {
+    content: ")";
+}
